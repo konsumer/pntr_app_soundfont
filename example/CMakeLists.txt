@@ -35,6 +35,14 @@ FetchContent_Declare(pntr_app
 )
 FetchContent_MakeAvailable(pntr_app)
 
+FetchContent_Declare(tsf
+  URL https://github.com/schellingb/TinySoundFont/archive/refs/heads/main.zip
+)
+FetchContent_MakeAvailable(tsf)
+
+add_executable(sfotool "${tsf_SOURCE_DIR}/sfotool/main.c")
+target_include_directories(sfotool PRIVATE "${tsf_SOURCE_DIR}")
+
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
 
@@ -44,4 +52,4 @@ if (EMSCRIPTEN)
 else()
   target_link_libraries(pntr_app_soundfont_example pntr pntr_app raylib)
 endif ()
-target_include_directories(pntr_app_soundfont_example PRIVATE "${CMAKE_CURRENT_LIST_DIR}/.." "${raylib_SOURCE_DIR}/src")
+target_include_directories(pntr_app_soundfont_example PRIVATE "${CMAKE_CURRENT_LIST_DIR}/.." "${raylib_SOURCE_DIR}/src" "${tsf_SOURCE_DIR}")
