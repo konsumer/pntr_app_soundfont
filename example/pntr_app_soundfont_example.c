@@ -30,7 +30,7 @@ bool Init(pntr_app *app) {
   pntr_app_soundfont_channel_set_bank_preset(appData->soundfont, 9, 128, 0);
 
   tml_message *TinyMidiLoader = NULL;
-  TinyMidiLoader = tml_load_filename("venture.mid");
+  TinyMidiLoader = tml_load_filename("example/venture.mid");
   if (!TinyMidiLoader) {
     fprintf(stderr, "Could not load MIDI file\n");
     return false;
