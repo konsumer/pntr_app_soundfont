@@ -1,4 +1,4 @@
-This will let you load soundfonts in [pntr_app](https://github.com/robloach/pntr_app), using [TinySoundFont](https://github.com/schellingb/TinySoundFont).
+This will let you load soundfonts & midi files in [pntr_app](https://github.com/robloach/pntr_app), using [TinySoundFont](https://github.com/schellingb/TinySoundFont).
 
 it supports sf2, sf3, and sfo files.
 

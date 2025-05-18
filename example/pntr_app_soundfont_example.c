@@ -2,20 +2,16 @@
 #define PNTR_ENABLE_DEFAULT_FONT
 #include "pntr_app.h"
 
+#define PNTR_APP_MIDI_IMPLEMENTATION
+#include "pntr_app_midi.h"
+
 #define PNTR_APP_SOUNDFONT_IMPLEMENTATION
 #define PNTR_APP_ENABLE_DEFAULT_SOUNDFONT
 #include "pntr_app_soundfont.h"
 
-// this is a very simple midi-file loader
-#define TML_IMPLEMENTATION
-#include "tml.h"
-
 typedef struct AppData {
   pntr_font *font;
   pntr_soundfont *soundfont;
-
-  double g_Msec;              // current playback time
-  tml_message *g_MidiMessage; // next message to be played
 } AppData;
 
 bool Init(pntr_app *app) {
@@ -24,19 +20,6 @@ bool Init(pntr_app *app) {
 
   appData->font = pntr_load_font_default();
   appData->soundfont = pntr_load_soundfont_default();
-
-  // Initialize preset on special 10th MIDI channel to use percussion sound bank
-  // (128) if available
-  pntr_app_soundfont_channel_set_bank_preset(appData->soundfont, 9, 128, 0);
-
-  tml_message *TinyMidiLoader = NULL;
-  TinyMidiLoader = tml_load_filename("example/venture.mid");
-  if (!TinyMidiLoader) {
-    fprintf(stderr, "Could not load MIDI file\n");
-    return false;
-  }
-
-  appData->g_MidiMessage = TinyMidiLoader;
 
   return true;
 }
