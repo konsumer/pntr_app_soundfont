@@ -13,7 +13,7 @@ typedef tml_message pntr_midi_message;
 // Loading/initialization functions
 pntr_midi_message *pntr_app_midi_load_memory(const void *buffer, int size);
 pntr_midi_message *pntr_app_midi_load(const char *filename);
-void pntr_app_midi_free(pntr_midi_message *midi);
+void pntr_app_midi_unload(pntr_midi_message *midi);
 
 // MIDI message information
 int pntr_app_midi_get_info(pntr_midi_message *first_message, int *used_channels,
@@ -36,7 +36,7 @@ pntr_midi_message *pntr_app_midi_load(const char *filename) {
   unsigned char *data = pntr_load_file(filename, &bytesRead);
   if (!data)
     return NULL;
-  pntr_midi_message *result = tml_load_memory(data, (int)bytesRead);
+  pntr_midi_message *result = pntr_app_midi_load_memory(data, (int)bytesRead);
   free(data);
   return result;
 }
@@ -45,7 +45,7 @@ pntr_midi_message *pntr_app_midi_load_memory(const void *buffer, int size) {
   return tml_load_memory(buffer, size);
 }
 
-void pntr_app_midi_free(pntr_midi_message *midi) { tml_free(midi); }
+void pntr_app_midi_unload(pntr_midi_message *midi) { tml_free(midi); }
 
 // MIDI message information implementation
 int pntr_app_midi_get_info(pntr_midi_message *first_message, int *used_channels,

@@ -5,17 +5,19 @@
 #define TSF_IMPLEMENTATION
 #endif // PNTR_APP_SOUNDFONT_IMPLEMENTATION
 
-#include "pntr.h"
+#include "pntr_app.h"
 #include "tsf.h"
 
 typedef tsf pntr_soundfont;
 
+// TODO: pass app to loaders, so the font can be bound to output
+
 // Loading/initialization functions
-pntr_soundfont *pntr_load_soundfont_default(void);
+pntr_soundfont *pntr_app_soundfont_load_default();
 pntr_soundfont *pntr_app_soundfont_load(const char *filename);
 pntr_soundfont *pntr_app_soundfont_load_memory(const void *buffer, int size);
 pntr_soundfont *pntr_app_soundfont_copy(pntr_soundfont *f);
-void pntr_app_soundfont_close(pntr_soundfont *f);
+void pntr_app_soundfont_unload(pntr_soundfont *f);
 void pntr_app_soundfont_reset(pntr_soundfont *f);
 
 // Preset management
@@ -27,13 +29,6 @@ const char *pntr_app_soundfont_get_presetname(const pntr_soundfont *f,
 const char *pntr_app_soundfont_bank_get_presetname(const pntr_soundfont *f,
                                                    int bank, int preset_number);
 
-// Output settings
-void pntr_app_soundfont_set_output(pntr_soundfont *f,
-                                   enum TSFOutputMode outputmode,
-                                   int samplerate, float global_gain_db);
-void pntr_app_soundfont_set_volume(pntr_soundfont *f, float global_gain);
-int pntr_app_soundfont_set_max_voices(pntr_soundfont *f, int max_voices);
-
 // Direct note control
 int pntr_app_soundfont_note_on(pntr_soundfont *f, int preset_index, int key,
                                float vel);
@@ -44,12 +39,6 @@ int pntr_app_soundfont_bank_note_off(pntr_soundfont *f, int bank,
                                      int preset_number, int key);
 void pntr_app_soundfont_note_off_all(pntr_soundfont *f);
 int pntr_app_soundfont_active_voice_count(pntr_soundfont *f);
-
-// Audio rendering
-void pntr_app_soundfont_render_short(pntr_soundfont *f, short *buffer,
-                                     int samples, int flag_mixing);
-void pntr_app_soundfont_render_float(pntr_soundfont *f, float *buffer,
-                                     int samples, int flag_mixing);
 
 // Channel settings
 int pntr_app_soundfont_channel_set_presetindex(pntr_soundfont *f, int channel,
@@ -103,7 +92,7 @@ float pntr_app_soundfont_channel_get_tuning(pntr_soundfont *f, int channel);
 #ifndef PNTR_APP_SOUNDFONT_IMPLEMENTATION_ONCE
 #define PNTR_APP_SOUNDFONT_IMPLEMENTATION_ONCE
 
-pntr_soundfont *pntr_load_soundfont_default(void) {
+pntr_soundfont *pntr_app_soundfont_load_default() {
 #ifdef PNTR_APP_DEFAULT_SOUNDFONT
   return PNTR_APP_DEFAULT_SOUNDFONT();
 #elif defined(PNTR_APP_ENABLE_DEFAULT_SOUNDFONT)
@@ -118,12 +107,14 @@ pntr_soundfont *pntr_app_soundfont_load(const char *filename) {
   unsigned char *data = pntr_load_file(filename, &bytesRead);
   if (!data)
     return NULL;
-  pntr_soundfont *result = tsf_load_memory(data, bytesRead);
+  pntr_soundfont *result = pntr_app_soundfont_load_memory(data, bytesRead);
   free(data);
   return result;
 }
 
 pntr_soundfont *pntr_app_soundfont_load_memory(const void *buffer, int size) {
+  // TODO: attach to app output
+
   return tsf_load_memory(buffer, size);
 }
 
@@ -131,7 +122,7 @@ pntr_soundfont *pntr_app_soundfont_copy(pntr_soundfont *f) {
   return tsf_copy(f);
 }
 
-void pntr_app_soundfont_close(pntr_soundfont *f) { tsf_close(f); }
+void pntr_app_soundfont_unload(pntr_soundfont *f) { tsf_close(f); }
 
 void pntr_app_soundfont_reset(pntr_soundfont *f) { tsf_reset(f); }
 
@@ -154,21 +145,6 @@ const char *pntr_app_soundfont_bank_get_presetname(const pntr_soundfont *f,
                                                    int bank,
                                                    int preset_number) {
   return tsf_bank_get_presetname(f, bank, preset_number);
-}
-
-// Output settings implementations
-void pntr_app_soundfont_set_output(pntr_soundfont *f,
-                                   enum TSFOutputMode outputmode,
-                                   int samplerate, float global_gain_db) {
-  tsf_set_output(f, outputmode, samplerate, global_gain_db);
-}
-
-void pntr_app_soundfont_set_volume(pntr_soundfont *f, float global_gain) {
-  tsf_set_volume(f, global_gain);
-}
-
-int pntr_app_soundfont_set_max_voices(pntr_soundfont *f, int max_voices) {
-  return tsf_set_max_voices(f, max_voices);
 }
 
 // Direct note control implementations
@@ -195,17 +171,6 @@ void pntr_app_soundfont_note_off_all(pntr_soundfont *f) { tsf_note_off_all(f); }
 
 int pntr_app_soundfont_active_voice_count(pntr_soundfont *f) {
   return tsf_active_voice_count(f);
-}
-
-// Audio rendering implementations
-void pntr_app_soundfont_render_short(pntr_soundfont *f, short *buffer,
-                                     int samples, int flag_mixing) {
-  tsf_render_short(f, buffer, samples, flag_mixing);
-}
-
-void pntr_app_soundfont_render_float(pntr_soundfont *f, float *buffer,
-                                     int samples, int flag_mixing) {
-  tsf_render_float(f, buffer, samples, flag_mixing);
 }
 
 // Channel settings implementations

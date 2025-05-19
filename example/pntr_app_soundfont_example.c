@@ -2,49 +2,43 @@
 #define PNTR_ENABLE_DEFAULT_FONT
 #include "pntr_app.h"
 
-#define PNTR_APP_MIDI_IMPLEMENTATION
-#include "pntr_app_midi.h"
-
 #define PNTR_APP_SOUNDFONT_IMPLEMENTATION
 #define PNTR_APP_ENABLE_DEFAULT_SOUNDFONT
 #include "pntr_app_soundfont.h"
 
-typedef struct AppData {
-  pntr_font *font;
-  pntr_soundfont *soundfont;
-} AppData;
+#define PNTR_APP_MIDI_IMPLEMENTATION
+#include "pntr_app_midi.h"
+
+static pntr_font *font;
+static pntr_soundfont *soundfont;
 
 bool Init(pntr_app *app) {
-  AppData *appData = pntr_load_memory(sizeof(AppData));
-  pntr_app_set_userdata(app, appData);
+  font = pntr_load_font_default();
+  soundfont = pntr_app_soundfont_load_default();
 
-  appData->font = pntr_load_font_default();
-  appData->soundfont = pntr_load_soundfont_default();
+  // map bank 128:0 to channel 10 (drums)
+  pntr_app_soundfont_channel_set_bank_preset(soundfont, 9, 128, 0);
 
   return true;
 }
 
 bool Update(pntr_app *app, pntr_image *screen) {
-  AppData *appData = (AppData *)pntr_app_userdata(app);
   pntr_clear_background(screen, PNTR_RAYWHITE);
 
-  pntr_draw_text(screen, appData->font, "You should hear music playing.", 80,
-                 100, PNTR_BLACK);
-  pntr_draw_text(screen, appData->font, "If not, click on window.", 100, 120,
+  pntr_draw_text(screen, font, "You should hear music playing.", 80, 100,
+                 PNTR_BLACK);
+  pntr_draw_text(screen, font, "If not, click on window.", 100, 120,
                  PNTR_BLACK);
 
   return true;
 }
 
 void Close(pntr_app *app) {
-  AppData *appData = (AppData *)pntr_app_userdata(app);
-  pntr_unload_font(appData->font);
-  pntr_unload_memory(appData);
+  pntr_unload_font(font);
+  pntr_app_soundfont_unload(soundfont);
 }
 
-void Event(pntr_app *app, pntr_app_event *event) {
-  AppData *appData = (AppData *)pntr_app_userdata(app);
-}
+void Event(pntr_app *app, pntr_app_event *event) {}
 
 pntr_app Main(int argc, char *argv[]) {
   (void)argc;

@@ -9,7 +9,20 @@ Basic usage looks like this:
 #define PNTR_APP_ENABLE_DEFAULT_SOUNDFONT
 #include "pntr_app_soundfont.h"
 
-// TODO
+#define PNTR_APP_MIDI_IMPLEMENTATION
+#include "pntr_app_midi.h"
+
+static pntr_app_soundfont* soundfont;
+static pntr_app_midi* message;
+
+// INIT
+soundfont = pntr_app_soundfont_load_default();
+// or
+soundfont = pntr_app_soundfont_load("cool.sf2");
+
+midi = pntr_app_midi_load("cool.mid");
+
+pntr_app_midi_play(app, soundfont, midi);
 ```
 
 I have included [an example](example), too. You can build it with this:
