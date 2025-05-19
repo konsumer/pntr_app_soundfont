@@ -6,7 +6,7 @@ I have included [an example](example). You can build it with this:
 
 ```
 cd example
-cmake -B build
+cmake -DCMAKE_BUILD_TYPE=Release -B build
 cmake --build build
 ```
 
