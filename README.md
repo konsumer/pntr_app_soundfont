@@ -1,6 +1,6 @@
 This will let you load soundfonts & midi files in [pntr_app](https://github.com/robloach/pntr_app), using [TinySoundFont](https://github.com/schellingb/TinySoundFont).
 
-it supports sf2, sf3, and sfo files.
+it supports sf2, sf3, and sfo files for soundfont, and midi files for score.
 
 Basic usage looks like this:
 
@@ -13,7 +13,7 @@ Basic usage looks like this:
 #include "pntr_app_midi.h"
 
 static pntr_app_soundfont* soundfont;
-static pntr_app_midi* message;
+static pntr_app_midi* midi;
 
 // INIT
 soundfont = pntr_app_soundfont_load_default();
@@ -21,8 +21,13 @@ soundfont = pntr_app_soundfont_load_default();
 soundfont = pntr_app_soundfont_load("cool.sf2");
 
 midi = pntr_app_midi_load("cool.mid");
-
 pntr_app_midi_play(app, soundfont, midi);
+
+
+// CLOSE
+pntr_app_midi_stop(midi);
+pntr_app_midi_unload(midi);
+pntr_app_soundfont_unload(soundfont);
 ```
 
 I have included [an example](example), too. You can build it with this:
